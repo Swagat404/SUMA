@@ -1,0 +1,149 @@
+openapi: 3.0.0
+info:
+  title: suma api 
+  description: submit training jobs using suma api 
+  version: 1.0.0 
+servers:
+  - url: https://www.suma.org
+
+paths:
+  /api/v1/create:
+    post:
+      summary: create a resource
+      parameters:
+        - name: certificate
+          in: header
+          required: true
+          example: ayush@1euur32b8204fiehew
+          schema:
+            type: string     
+        - name: resource
+          in: query
+          required: true
+          schema:
+            type: string  
+            example: namespace 
+      responses:
+        '200':
+          description: requested resource created
+          content:
+            application/json:
+              schema:
+                type: string
+                example: success
+        '400':
+          description: resource creation failed
+          content:
+            application/json:
+              schema:
+                type: string
+                example: failed
+  /api/v1/delete:
+    delete:
+      summary: delete a resource
+      parameters:
+        - name: certificate
+          in: header
+          required: true
+          example: ayush@1euur32b8204fiehew
+          schema:
+            type: string
+        - name: resource
+          in: query
+          required: true
+          schema:
+            type: string  
+            example: job
+      responses:
+        '200':
+          description: resource deleted
+          content:
+            application/json:
+              schema:
+                type: string
+                example: success
+        '400':
+          description: request failed
+          content:
+            application/json:
+              schema:
+                type: string
+                example: failed
+              
+  /api/v1/monitor:
+    get:
+      summary: monitor a resource
+      parameters:
+        - name: certificate
+          in: header
+          required: true
+          schema:
+            type: string
+            example: ayush@1euur32b8204fiehew 
+        - name: resource
+          in: query
+          required: true
+          schema:
+            type: string  
+            example: namespace 
+      responses:
+        '200':
+          description: monitoring
+          content:
+            application/json:
+              schema:
+                type: string
+                example: success
+        '400':
+          description: monitoring request failed
+          content:
+            application/json:
+              schema:
+                type: string
+                example: failed
+  /api/v1/submit:
+    post:
+      summary: submit a training job
+      parameters:
+        - name: certificate
+          in: header
+          required: true
+          schema:
+            type: string
+            example: ayush@1euur32b8204fiehew 
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                image:
+                  type: string
+                  example: docker.io/ngnix:latest
+                nodes:
+                  type: integer
+                  example: 5
+                hardware:
+                  type: array
+                  items:
+                    type: integer
+                  example: [1,6,4]
+                volume:
+                  type: integer
+                  example: 1
+      responses:
+        '200':
+          description: job submission succeeded
+          content:
+            application/json:
+              schema:
+                type: string
+                example: success
+        '400':
+          description: job submission failed
+          content:
+            application/json:
+              schema:
+                type: string
+                example: failed
