@@ -129,6 +129,30 @@ suma-api/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/suma-api.dir/build.make CMakeFiles/suma-api.dir/build
 .PHONY : suma-api/fast
 
+external/sqlite3/sqlite3.o: external/sqlite3/sqlite3.c.o
+.PHONY : external/sqlite3/sqlite3.o
+
+# target to build an object file
+external/sqlite3/sqlite3.c.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/suma-api.dir/build.make CMakeFiles/suma-api.dir/external/sqlite3/sqlite3.c.o
+.PHONY : external/sqlite3/sqlite3.c.o
+
+external/sqlite3/sqlite3.i: external/sqlite3/sqlite3.c.i
+.PHONY : external/sqlite3/sqlite3.i
+
+# target to preprocess a source file
+external/sqlite3/sqlite3.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/suma-api.dir/build.make CMakeFiles/suma-api.dir/external/sqlite3/sqlite3.c.i
+.PHONY : external/sqlite3/sqlite3.c.i
+
+external/sqlite3/sqlite3.s: external/sqlite3/sqlite3.c.s
+.PHONY : external/sqlite3/sqlite3.s
+
+# target to generate assembly for a file
+external/sqlite3/sqlite3.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/suma-api.dir/build.make CMakeFiles/suma-api.dir/external/sqlite3/sqlite3.c.s
+.PHONY : external/sqlite3/sqlite3.c.s
+
 src/main.o: src/main.c.o
 .PHONY : src/main.o
 
@@ -162,6 +186,9 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... suma-api"
+	@echo "... external/sqlite3/sqlite3.o"
+	@echo "... external/sqlite3/sqlite3.i"
+	@echo "... external/sqlite3/sqlite3.s"
 	@echo "... src/main.o"
 	@echo "... src/main.i"
 	@echo "... src/main.s"

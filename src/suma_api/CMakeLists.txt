@@ -8,6 +8,7 @@ include_directories(
     /home/ayush/c/kubernetes
     /home/ayush/c/kubernetes
     /usr/include
+    ${CMAKE_SOURCE_DIR}/external/sqlite3
 )
 
 
@@ -15,6 +16,7 @@ link_directories(/home/ayush/c/kubernetes/build)
 
 set(SOURCE_FILES
     src/main.c
+    external/sqlite3/sqlite3.c
 )
 
 
