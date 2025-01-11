@@ -4,7 +4,7 @@
 # compile C with /usr/bin/cc
 C_DEFINES = 
 
-C_INCLUDES = -I/home/ayush/c/kubernetes -I/home/ayush/suma/src/suma_api/external/sqlite3
+C_INCLUDES = -I/home/ayush/c/kubernetes -I/home/ayush/suma/src/suma_api/external/sqlite3 -I/home/ayush/suma/src/suma_api/include
 
 C_FLAGS = -O3 -DNDEBUG -g
 

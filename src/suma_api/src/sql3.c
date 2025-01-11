@@ -1,307 +1,218 @@
-#include <sqlite3.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <pthread.h>
+/***************************************************************************
+ *                                  _____ __  __ 
+ *  Project                        / ____|  \/  |
+ *                                | (___  | \  / |
+ *                                 \___ \ | |\/| |
+ *                                 ____) || |  | |
+ *                                |_____/ |_|  |_|
+ *
+ * Project Suma
+ * 
+ * Copyright (C) <your.email@example.com>, et al.
+ *
+ * This software is licensed as described in the file COPYING, which
+ * should be included as part of this distribution. The terms
+ * are also available at [https://yourprojecturl.example.com/license].
+ *
+ * You may opt to use, copy, modify, merge, publish, distribute and/or sell
+ * copies of the Software, and permit persons to whom the Software is
+ * furnished to do so, under the terms of the COPYING file.
+ *
+ * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+ * KIND, either express or implied.
+ *
+ * SPDX-License-Identifier: [your-spdx-identifier]
+ *
+ ***************************************************************************/
+
 #include "sql3.h"
+#include <string.h>
+#include <stdio.h>
+#include <pthread.h>
 
-#define MAX_CONNECTIONS 100
-#define DEFAULT_IDLE_CONNECTIONS 10
 
-// Global state
-static sql3_info g_sql3_info = {0, 0, 0, NULL};
-static sqlite3 *g_db = NULL;
+static sql3_connection g_sql3_conn = {0, NULL};
 static pthread_mutex_t g_mutex = PTHREAD_MUTEX_INITIALIZER;
 
-int sql3_init(
-    int sql3_config,
-    int db_flags,
-    const char *filename,
-    sqlite3 **ppDb,
-    const char *zVfs) {
+
+int sql3_init(const char *filename, int db_flags, const char *zVfs) {
     
     int rc;
-    
-    // Initialize SQLite
-    sqlite3_config(sql3_config);
-    rc = sqlite3_initialize();
-    if (rc != SQLITE_OK) {
-        return rc;
+    if (g_sql3_conn.hd != NULL){
+        return SQLITE_OK;
     }
-    
-    // Open database connection
-    rc = sqlite3_open_v2(filename, ppDb, db_flags, zVfs);
-    if (rc != SQLITE_OK) {
-        sqlite3_close(*ppDb);
-        return rc;
-    }
-    
-    g_db = *ppDb;
-    
-    // Initialize connection pool
-    g_sql3_info.connections_count = 0;
-    g_sql3_info.idle_connections = 0;
-    g_sql3_info.mutex_blocking = 0;
-    g_sql3_info.connections = NULL;
-    
-    // Create initial idle connections
-    return sql3_init_idle_connection(&g_sql3_info.connections, DEFAULT_IDLE_CONNECTIONS);
-}
 
-int sql3_destroy() {
-    sql3_open_connections *current = g_sql3_info.connections;
-    sql3_open_connections *next;
+    pthread_mutex_lock(&g_mutex);   
+    rc = sqlite3_config(SQLITE_CONFIG_MULTITHREAD);    /* Configure for serialized threading mode*/
     
-    // Close all connections
-    while (current != NULL) {
-        next = current->next;
-        if (current->db) {
-            sqlite3_close(current->db);
-        }
-        free(current);
-        current = next;
+    if (rc != SQLITE_OK) {               
+        printf("Configuring sqlite3 in SQLITE_CONFIG_MULTITHREAD mode failed");   /*Check if configuration was successful*/
+        pthread_mutex_unlock(&g_mutex);                 
+        return rc;
+    }
+
+    rc = sqlite3_open_v2(                                /*Open database connection*/
+        filename, 
+        &g_sql3_conn.hd, 
+        db_flags | SQLITE_OPEN_READWRITE | SQLITE_OPEN_FULLMUTEX,
+        zVfs
+        );
+
+
+    if (rc != SQLITE_OK) {
+        const char* err = sqlite3_errmsg(g_sql3_conn.hd);
+        printf("Error:%s\n", err);
+        pthread_mutex_unlock(&g_mutex);
+        return rc;
     }
     
-    // Reset global state
-    g_sql3_info.connections = NULL;
-    g_sql3_info.connections_count = 0;
-    g_sql3_info.idle_connections = 0;
-    g_sql3_info.mutex_blocking = 0;
-    
-    if (g_db) {
-        sqlite3_close(g_db);
-        g_db = NULL;
-    }
-    
-    sqlite3_shutdown();
+    pthread_mutex_unlock(&g_mutex);
     return SQLITE_OK;
 }
 
-int sql3_get_connection(sqlite3 **db) {
-    int rc = SQLITE_OK;
-    sql3_open_connections *conn;
-    
+
+
+int sql3_destroy() {
+    int rc;
     pthread_mutex_lock(&g_mutex);
     
-    if (g_sql3_info.mutex_blocking) {
+    // Check if there's an active connection
+    if (g_sql3_conn.hd == NULL) {
         pthread_mutex_unlock(&g_mutex);
-        return SQLITE_BUSY;
+        return SQLITE_OK;  // Nothing to destroy
     }
     
-    // Find an idle connection
-    conn = g_sql3_info.connections;
-    while (conn != NULL) {
-        if (conn->db != NULL) {
-            *db = conn->db;
-            conn->db = NULL;
-            g_sql3_info.idle_connections--;
-            pthread_mutex_unlock(&g_mutex);
-            return SQLITE_OK;
-        }
-        conn = conn->next;
-    }
-    
-    // If no idle connections and under MAX_CONNECTIONS, create new one
-    if (g_sql3_info.connections_count < MAX_CONNECTIONS) {
-        rc = sqlite3_open(sqlite3_db_filename(g_db, "main"), db);
-        if (rc == SQLITE_OK) {
-            g_sql3_info.connections_count++;
-        }
-    } else {
-        rc = SQLITE_ERROR;
+    // Close database connection
+    rc = sqlite3_close(g_sql3_conn.hd);
+    if (rc == SQLITE_OK) {
+        g_sql3_conn.hd = NULL;
     }
     
     pthread_mutex_unlock(&g_mutex);
     return rc;
 }
 
-int sql3_block_mutex() {
-    pthread_mutex_lock(&g_mutex);
-    g_sql3_info.mutex_blocking = 1;
-    
-    // Close all connections
-    sql3_open_connections *current = g_sql3_info.connections;
-    while (current != NULL) {
-        if (current->db) {
-            sqlite3_close(current->db);
-            current->db = NULL;
-        }
-        current = current->next;
+
+int sql3_get_connection(sqlite3 **db) {
+
+    if (!db) {
+        return SQLITE_ERROR;
     }
     
-    pthread_mutex_unlock(&g_mutex);
-    return SQLITE_OK;
-}
-
-int sql3_unlock_mutex() {
-    int rc = SQLITE_OK;
-    pthread_mutex_lock(&g_mutex);
     
-    if (!g_sql3_info.mutex_blocking) {
+    if (g_sql3_conn.hd == NULL || g_sql3_conn.active_connections >= MAX_CLIENT) {
         pthread_mutex_unlock(&g_mutex);
         return SQLITE_ERROR;
     }
     
-    // Reopen connections
-    sql3_open_connections *current = g_sql3_info.connections;
-    while (current != NULL && rc == SQLITE_OK) {
-        if (current->db == NULL) {
-            rc = sqlite3_open(sqlite3_db_filename(g_db, "main"), &current->db);
-            if (rc == SQLITE_OK) {
-                g_sql3_info.idle_connections++;
-            }
-        }
-        current = current->next;
-    }
-    
-    g_sql3_info.mutex_blocking = 0;
-    pthread_mutex_unlock(&g_mutex);
-    return rc;
+
+    g_sql3_conn.active_connections++;
+    *db = g_sql3_conn.hd;
+
+    return SQLITE_OK;
 }
 
-int sql3_init_idle_connection(sql3_open_connections **connections, int idle_connections_batch_size) {
-    int rc = SQLITE_OK;
-    
+int sql3_release_connection() {
     pthread_mutex_lock(&g_mutex);
     
-    for (int i = 0; i < idle_connections_batch_size && rc == SQLITE_OK; i++) {
-        sql3_open_connections *new_conn = malloc(sizeof(sql3_open_connections));
-        if (!new_conn) {
-            rc = SQLITE_NOMEM;
-            break;
-        }
-        
-        rc = sqlite3_open(sqlite3_db_filename(g_db, "main"), &new_conn->db);
-        if (rc == SQLITE_OK) {
-            new_conn->next = *connections;
-            *connections = new_conn;
-            g_sql3_info.connections_count++;
-            g_sql3_info.idle_connections++;
-        } else {
-            free(new_conn);
-        }
-    }
-    
-    pthread_mutex_unlock(&g_mutex);
-    return rc;
-}
-
-int sql3_close_idle_connection(sql3_open_connections **connections, int idle_connections_batch_size) {
-    pthread_mutex_lock(&g_mutex);
-    
-    sql3_open_connections *current = *connections;
-    sql3_open_connections *prev = NULL;
-    int closed = 0;
-    
-    while (current != NULL && g_sql3_info.idle_connections > idle_connections_batch_size) {
-        if (current->db != NULL) {
-            sqlite3_close(current->db);
-            
-            if (prev == NULL) {
-                *connections = current->next;
-                free(current);
-                current = *connections;
-            } else {
-                prev->next = current->next;
-                free(current);
-                current = prev->next;
-            }
-            
-            g_sql3_info.connections_count--;
-            g_sql3_info.idle_connections--;
-            closed++;
-        } else {
-            prev = current;
-            current = current->next;
-        }
+    if (g_sql3_conn.active_connections > 0) {
+        g_sql3_conn.active_connections--;
     }
     
     pthread_mutex_unlock(&g_mutex);
     return SQLITE_OK;
 }
 
-int sql3_insert_data(
-    sqlite3 *db,
-    const char *table_name,
-    const char *column_names,
-    const char *values) {
-    
-    char *sql = NULL;
-    char *err_msg = NULL;
+
+/*
+need to optimize here by making prepared statements and re-using them
+*/
+int sql3_insert(sqlite3 *db, const char *table_name, const char *column_names, const char *values) {
+    char *sql;
+    char *err_msg = 0;
     int rc;
     
-    sql = sqlite3_mprintf("INSERT INTO %s (%s) VALUES (%s);",
-                         table_name, column_names, values);
+    if (!db || !table_name || !column_names || !values) {
+        return SQLITE_ERROR;
+    }
+    
+    // Construct INSERT query
+    sql = sqlite3_mprintf("INSERT INTO %s (%s) VALUES (%s);", table_name, column_names, values);
+    if (!sql) {
+        return SQLITE_NOMEM;
+    }
+    
+    // Execute query
+    rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
+    if (rc != SQLITE_OK) {
+        sqlite3_free(err_msg);
+    }
+    
+    sqlite3_free(sql);
+    return rc;
+}
+
+int sql3_update(sqlite3 *db, const char *table_name, const char *column_names, const char *values, const char *condition) {
+    char *sql;
+    char *err_msg = 0;
+    int rc;
+    
+    if (!db || !table_name || !column_names || !values) {
+        return SQLITE_ERROR;
+    }
+    
+    // Construct UPDATE query
+    if (condition) {
+        sql = sqlite3_mprintf("UPDATE %s SET %s = %s WHERE %s;", table_name, column_names, values, condition);
+    } else {
+        sql = sqlite3_mprintf("UPDATE %s SET %s = %s;", table_name, column_names, values);
+    }
     
     if (!sql) {
         return SQLITE_NOMEM;
     }
     
-    rc = sqlite3_exec(db, sql, NULL, NULL, &err_msg);
-    
-    sqlite3_free(sql);
-    if (err_msg) {
+    // Execute query
+    rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
+    if (rc != SQLITE_OK) {
         sqlite3_free(err_msg);
     }
     
+    sqlite3_free(sql);
     return rc;
 }
 
-int sql3_update_data(
-    sqlite3 *db,
-    const char *table_name,
-    const char *column_names,
-    const char *values,
-    const char *condition) {
-    
-    char *sql = NULL;
-    char *err_msg = NULL;
+int sql3_delete(sqlite3 *db, const char *table_name, const char *condition) {
+    char *sql;
+    char *err_msg = 0;
     int rc;
     
-    sql = sqlite3_mprintf("UPDATE %s SET %s = %s WHERE %s;",
-                         table_name, column_names, values, condition);
+    if (!db || !table_name) {
+        return SQLITE_ERROR;
+    }
+    
+    // Construct DELETE query
+    if (condition) {
+        sql = sqlite3_mprintf("DELETE FROM %s WHERE %s;", table_name, condition);
+    } else {
+        sql = sqlite3_mprintf("DELETE FROM %s;", table_name);
+    }
     
     if (!sql) {
         return SQLITE_NOMEM;
     }
     
-    rc = sqlite3_exec(db, sql, NULL, NULL, &err_msg);
-    
-    sqlite3_free(sql);
-    if (err_msg) {
+    // Execute query
+    rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
+    if (rc != SQLITE_OK) {
         sqlite3_free(err_msg);
     }
     
-    return rc;
-}
-
-int sql3_delete_data(
-    sqlite3 *db,
-    const char *table_name,
-    const char *condition) {
-    
-    char *sql = NULL;
-    char *err_msg = NULL;
-    int rc;
-    
-    sql = sqlite3_mprintf("DELETE FROM %s WHERE %s;",
-                         table_name, condition);
-    
-    if (!sql) {
-        return SQLITE_NOMEM;
-    }
-    
-    rc = sqlite3_exec(db, sql, NULL, NULL, &err_msg);
-    
     sqlite3_free(sql);
-    if (err_msg) {
-        sqlite3_free(err_msg);
-    }
-    
     return rc;
 }
 
-int sql3_select_data(
+int sql3_select(
     sqlite3 *db,
     const char *table_name,
     const char *column_names,
@@ -313,8 +224,11 @@ int sql3_select_data(
     char *err_msg = NULL;
     int rc;
     
-    sql = sqlite3_mprintf("SELECT %s FROM %s WHERE %s;",
-                         column_names, table_name, condition);
+    if(condition){
+        sql = sqlite3_mprintf("SELECT %s FROM %s WHERE %s;", column_names, table_name, condition);
+    } else {
+        sql = sqlite3_mprintf("SELECT %s FROM %s;", column_names, table_name);
+    }
     
     if (!sql) {
         return SQLITE_NOMEM;

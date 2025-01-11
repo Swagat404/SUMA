@@ -177,6 +177,30 @@ src/main.c.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/suma-api.dir/build.make CMakeFiles/suma-api.dir/src/main.c.s
 .PHONY : src/main.c.s
 
+src/sql3.o: src/sql3.c.o
+.PHONY : src/sql3.o
+
+# target to build an object file
+src/sql3.c.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/suma-api.dir/build.make CMakeFiles/suma-api.dir/src/sql3.c.o
+.PHONY : src/sql3.c.o
+
+src/sql3.i: src/sql3.c.i
+.PHONY : src/sql3.i
+
+# target to preprocess a source file
+src/sql3.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/suma-api.dir/build.make CMakeFiles/suma-api.dir/src/sql3.c.i
+.PHONY : src/sql3.c.i
+
+src/sql3.s: src/sql3.c.s
+.PHONY : src/sql3.s
+
+# target to generate assembly for a file
+src/sql3.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/suma-api.dir/build.make CMakeFiles/suma-api.dir/src/sql3.c.s
+.PHONY : src/sql3.c.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -192,6 +216,9 @@ help:
 	@echo "... src/main.o"
 	@echo "... src/main.i"
 	@echo "... src/main.s"
+	@echo "... src/sql3.o"
+	@echo "... src/sql3.i"
+	@echo "... src/sql3.s"
 .PHONY : help
 
 

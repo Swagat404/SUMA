@@ -10,6 +10,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "/home/ayush/suma/src/suma_api/external/sqlite3/sqlite3.c" "CMakeFiles/suma-api.dir/external/sqlite3/sqlite3.c.o" "gcc" "CMakeFiles/suma-api.dir/external/sqlite3/sqlite3.c.o.d"
   "/home/ayush/suma/src/suma_api/src/main.c" "CMakeFiles/suma-api.dir/src/main.c.o" "gcc" "CMakeFiles/suma-api.dir/src/main.c.o.d"
+  "/home/ayush/suma/src/suma_api/src/sql3.c" "CMakeFiles/suma-api.dir/src/sql3.c.o" "gcc" "CMakeFiles/suma-api.dir/src/sql3.c.o.d"
   )
 
 # Targets to which this target links which contain Fortran sources.

@@ -1,151 +1,151 @@
 #ifndef SQL3_H
 #define SQL3_H
 
+/***************************************************************************
+ *                                  _____ __  __ 
+ *  Project                        / ____|  \/  |
+ *                                | (___  | \  / |
+ *                                 \___ \ | |\/| |
+ *                                 ____) || |  | |
+ *                                |_____/ |_|  |_|
+ *
+ * Project Suma
+ * 
+ * Copyright (C) <your.email@example.com>, et al.
+ *
+ * This software is licensed as described in the file COPYING, which
+ * should be included as part of this distribution. The terms
+ * are also available at [https://yourprojecturl.example.com/license].
+ *
+ * You may opt to use, copy, modify, merge, publish, distribute and/or sell
+ * copies of the Software, and permit persons to whom the Software is
+ * furnished to do so, under the terms of the COPYING file.
+ *
+ * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+ * KIND, either express or implied.
+ *
+ * SPDX-License-Identifier: [your-spdx-identifier]
+ *
+ ***************************************************************************/
+
 #include <sqlite3.h>
 
-// Forward declaration
-struct sql3_open_connections;
-
-struct sql3_open_connections {
-    sqlite3 *db;
-    struct sql3_open_connections *next;
-};
-
-struct sql3_info {
-    int connections_count;
-    int idle_connections;
-    int mutex_blocking;
-    struct sql3_open_connections *connections;
-};
+#define MAX_CLIENT 100
 
 /*
-Initialize sql3 library, database and a sql3_handler
-@param sql3_config: configuration for the sql3 library
-@param db_flags: flags for the database
-@param filename: Database filename (UTF-8)
-@param ppDb: OUT: SQLite db handle
-@param zVfs: VFS name
-@return SQLITE_OK on success, error code on failure
+so, we can support two modes of operations:
+1. a single connecition FULLMUTEX fro wrtiting and multiple connections NOMUTEX for reading
+configuration options with 1:
+    max connections for reading that is allowed. 
+    a pool of connections for reading will be maintained
+    to tweek the pool one can set the batch_size  
+2. a single connection FULLMUTEX for reading and writing.
+everything will be serialized internally. max clients can be configured
+
+3. multiple NOMUTEX conenctions are used to write and  a single NOMUTEX connection for writing 
+but we manually serilize the writes.  
+
+if first option or the third is occupanied by database in wal mode then write operations won't block the readers.
+further more begin commit transactions by writer threads will enhance the speed of writes. as the actual commit happens
+much later.
+
+for now just go with second option and implement the other much later. 
+
+let's develop a proper linrary for testing, debugging sql code and making it easier to user for web servers.
+let's give all the modes we talked about above. with proper benchmarks on different architecturs and embedded systems.
+also need to pack information in a confif file where can set the configurations. 
+*/
+
+/*
+All sql3 operations are thread safe. sql3_init() must be called before any other sql3 
+operation. sql3 is configured to be in SQL_CONFIG_SERIALIZED mode and connecitons are 
+opened in SQLITE_OPEN_FULLMUTEX mode. This means that all threads can access the database
+using the same handle. sqlite3 internally serealisez all the operations. 
+*/ 
+
+/*
+sql3_connection: This structure holds details about the database connection,
+*/
+typedef struct sql3_connection {
+    int active_connections;    /*Total number of threads using the connection*/
+    sqlite3 *hd;               /*Handle to the connection*/
+}sql3_connection;
+
+
+/*
+Initialize sql3 library, database and a sql3_handler. This routine is "effective"
+only if a connection is not already open.
 */
 int sql3_init(
-    int sql3_config,
-    int db_flags,
-    const char *filename,
-    sqlite3 **ppDb,
-    const char *zVfs);
+    //int sql3_flags,       /*sql3_flags: Flags for the sql3 library*/
+    const char *filename,   /*filename: Database filename (UTF-8)*/
+    int db_flags,           /*db_flags: flags for the database*/
+    const char *zVfs        /*zVfs: Name of VFS module to use*/
+    );
 
 /*
-Drains all open connections and deletes all resources allocated with sql3_init()
-@return SQLITE_OK on success, error code on failure
+Deletes all resources allocated with sql3_init() and closes the database. This routine is 
+"effective" only if sql3_init() was called before. Subsequent calls to sql3_destroy() will
+have no effect. All active clients must release their connection before calling this routine.
+Otherwise, the behaviour is undefined.
 */
 int sql3_destroy();
 
 /*
-This routine is thread safe. It assigns an idle connection from list of all open connections or
-creates one a new connection if there aren't any idle connections and the number of open connections
-is less than MAX_CONNECTIONS. If the number of open connections is equal to MAX_CONNECTIONS then it
-returns the calling thread with an error.
-@param db: OUT: SQLite db handle
-@return SQLITE_OK on success, SQLITE_BUSY if blocked, SQLITE_ERROR if max connections reached
+This routine is thread safe. Returns a handle to the database. If the number of active client
+using the handle is more than MAX_CLIENT then this returns the calling thread with an error.
 */
-int sql3_get_connection(sqlite3 **db);
+int sql3_get_connection(
+    sqlite3 **db           /*db: OUT: SQLite db handle*/
+);
 
 /*
-sql3_block_mutex closes all open connection to the database. This routine offers administrator to
-manually linger with the database file stored on the disk. sql3_unlock_mutex() can be used to bring
-the system back to normal. All connections that were open before sql3_block_mutex() was called will
-be opened again and will be ready for use. [[Note: sql3_block_mutex() is not thread safe.]]
-@return SQLITE_OK on success, error code on failure
+This routine is thread safe. Releases the connection handle.
 */
-int sql3_block_mutex();
+int sql3_release_connection();
 
-/*
-Restores the system back to its original state once sql3_block_mutex() was called. This
-routine is "effective" only if sql3_block_mutex() was called before. [[Note: sql3_unlock_mutex() is not thread safe.]]
-@return SQLITE_OK on success, SQLITE_ERROR if mutex wasn't blocked
-*/
-int sql3_unlock_mutex();
-
-/*
-Creates new connections to the database and adds them to the list of open connections.
-@param connections: OUT: list of open connections
-@param idle_connections_batch_size: number of connections to be opened
-@return SQLITE_OK on success, SQLITE_NOMEM on allocation failure, or other error codes
-*/
-int sql3_init_idle_connection(struct sql3_open_connections **connections, int idle_connections_batch_size);
-
-/*
-Closes the idle connections and removes them from the list of open connections. idle_connections_batch_size of
-idle connections will be maintained.
-@param connections: IN/OUT: list of open connections
-@param idle_connections_batch_size: minimum number of idle connections to maintain
-@return SQLITE_OK on success, error code on failure
-*/
-int sql3_close_idle_connection(struct sql3_open_connections **connections, int idle_connections_batch_size);
-
-/*
-sql3_insert_data, sql3_update_data, sql3_delete_data and sql3_select_data
-are thread safe and require a valid connection to the database to work.
-*/
 
 /*
 Insert data into specified table
-@param db: valid database connection
-@param table_name: name of the table
-@param column_names: comma-separated list of column names
-@param values: comma-separated list of values
-@return SQLITE_OK on success, error code on failure
 */
-int sql3_insert_data(
-    sqlite3 *db,
-    const char *table_name,
-    const char *column_names,
-    const char *values);
+int sql3_insert(
+    sqlite3 *db,                /*db: valid database hanlde*/
+    const char *table_name,     /*table_name: name of the table*/
+    const char *column_names,   /*column_names: comma-separated list of column names*/
+    const char *values          /*values: comma-separated list of values*/
+    );        
 
 /*
 Update data in specified table
-@param db: valid database connection
-@param table_name: name of the table
-@param column_names: comma-separated list of column names
-@param values: comma-separated list of new values
-@param condition: WHERE clause condition
-@return SQLITE_OK on success, error code on failure
 */
-int sql3_update_data(
-    sqlite3 *db,
-    const char *table_name,
-    const char *column_names,
-    const char *values,
-    const char *condition);
+int sql3_update(
+    sqlite3 *db,                /*db: valid database handle*/
+    const char *table_name,     /*table_name: name of the table*/
+    const char *column_names,   /*column_names: comma-separated list of column names*/
+    const char *values,         /*values: comma-separated list of new values*/
+    const char *condition       /*condition: WHERE clause condition*/
+    );
 
 /*
 Delete data from specified table
-@param db: valid database connection
-@param table_name: name of the table
-@param condition: WHERE clause condition
-@return SQLITE_OK on success, error code on failure
 */
-int sql3_delete_data(
-    sqlite3 *db,
-    const char *table_name,
-    const char *condition);
+int sql3_delete(
+    sqlite3 *db,                /*db: valid database handle*/
+    const char *table_name,     /*table_name: name of the table*/
+    const char *condition       /*condition: WHERE clause condition*/
+    );
 
 /*
 Select data from specified table
-@param db: valid database connection
-@param table_name: name of the table
-@param column_names: comma-separated list of column names
-@param condition: WHERE clause condition
-@param callback: callback function to handle result rows
-@param arg: first argument passed to callback
-@return SQLITE_OK on success, error code on failure
 */
-int sql3_select_data(
-    sqlite3 *db,
-    const char *table_name,
-    const char *column_names,
-    const char *condition,
-    int (*callback)(void*, int, char**, char**),
-    void *arg);
+int sql3_select(
+    sqlite3 *db,                                    /*db: valid database handle*/
+    const char *table_name,                         /*table_name: name of the table*/
+    const char *column_names,                       /*column_names: comma-separated list of column names*/
+    const char *condition,                          /*condition: WHERE clause condition*/
+    int (*callback)(void*, int, char**, char**),    /*callback: callback function*/
+    void *arg                                       /*arg: first argument to the callback function*/
+    );
+
 
 #endif // SQL3_H

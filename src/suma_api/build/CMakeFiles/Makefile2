@@ -81,12 +81,12 @@ clean: CMakeFiles/suma-api.dir/clean
 CMakeFiles/suma-api.dir/all:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/suma-api.dir/build.make CMakeFiles/suma-api.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/suma-api.dir/build.make CMakeFiles/suma-api.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/ayush/suma/src/suma_api/build/CMakeFiles --progress-num=1,2,3 "Built target suma-api"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/ayush/suma/src/suma_api/build/CMakeFiles --progress-num=1,2,3,4 "Built target suma-api"
 .PHONY : CMakeFiles/suma-api.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/suma-api.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/ayush/suma/src/suma_api/build/CMakeFiles 3
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/ayush/suma/src/suma_api/build/CMakeFiles 4
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/suma-api.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/ayush/suma/src/suma_api/build/CMakeFiles 0
 .PHONY : CMakeFiles/suma-api.dir/rule
