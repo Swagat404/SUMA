@@ -1,3 +1,3 @@
-/home/ayush/suma/src/suma_api/build/CMakeFiles/suma-api.dir
-/home/ayush/suma/src/suma_api/build/CMakeFiles/edit_cache.dir
-/home/ayush/suma/src/suma_api/build/CMakeFiles/rebuild_cache.dir
+/home/ayush/SUMA/src/suma_api/build/CMakeFiles/suma-api.dir
+/home/ayush/SUMA/src/suma_api/build/CMakeFiles/edit_cache.dir
+/home/ayush/SUMA/src/suma_api/build/CMakeFiles/rebuild_cache.dir

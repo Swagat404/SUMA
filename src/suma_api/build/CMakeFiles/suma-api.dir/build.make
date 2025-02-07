@@ -53,10 +53,10 @@ RM = /usr/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/ayush/suma/src/suma_api
+CMAKE_SOURCE_DIR = /home/ayush/SUMA/src/suma_api
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/ayush/suma/src/suma_api/build
+CMAKE_BINARY_DIR = /home/ayush/SUMA/src/suma_api/build
 
 # Include any dependencies generated for this target.
 include CMakeFiles/suma-api.dir/depend.make
@@ -69,65 +69,35 @@ include CMakeFiles/suma-api.dir/progress.make
 # Include the compile flags for this target's objects.
 include CMakeFiles/suma-api.dir/flags.make
 
-CMakeFiles/suma-api.dir/src/main.c.o: CMakeFiles/suma-api.dir/flags.make
-CMakeFiles/suma-api.dir/src/main.c.o: /home/ayush/suma/src/suma_api/src/main.c
-CMakeFiles/suma-api.dir/src/main.c.o: CMakeFiles/suma-api.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/ayush/suma/src/suma_api/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building C object CMakeFiles/suma-api.dir/src/main.c.o"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/suma-api.dir/src/main.c.o -MF CMakeFiles/suma-api.dir/src/main.c.o.d -o CMakeFiles/suma-api.dir/src/main.c.o -c /home/ayush/suma/src/suma_api/src/main.c
+CMakeFiles/suma-api.dir/src/ssl_test.c.o: CMakeFiles/suma-api.dir/flags.make
+CMakeFiles/suma-api.dir/src/ssl_test.c.o: /home/ayush/SUMA/src/suma_api/src/ssl_test.c
+CMakeFiles/suma-api.dir/src/ssl_test.c.o: CMakeFiles/suma-api.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/ayush/SUMA/src/suma_api/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building C object CMakeFiles/suma-api.dir/src/ssl_test.c.o"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/suma-api.dir/src/ssl_test.c.o -MF CMakeFiles/suma-api.dir/src/ssl_test.c.o.d -o CMakeFiles/suma-api.dir/src/ssl_test.c.o -c /home/ayush/SUMA/src/suma_api/src/ssl_test.c
 
-CMakeFiles/suma-api.dir/src/main.c.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/suma-api.dir/src/main.c.i"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/ayush/suma/src/suma_api/src/main.c > CMakeFiles/suma-api.dir/src/main.c.i
+CMakeFiles/suma-api.dir/src/ssl_test.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/suma-api.dir/src/ssl_test.c.i"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/ayush/SUMA/src/suma_api/src/ssl_test.c > CMakeFiles/suma-api.dir/src/ssl_test.c.i
 
-CMakeFiles/suma-api.dir/src/main.c.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/suma-api.dir/src/main.c.s"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/ayush/suma/src/suma_api/src/main.c -o CMakeFiles/suma-api.dir/src/main.c.s
-
-CMakeFiles/suma-api.dir/src/sql3.c.o: CMakeFiles/suma-api.dir/flags.make
-CMakeFiles/suma-api.dir/src/sql3.c.o: /home/ayush/suma/src/suma_api/src/sql3.c
-CMakeFiles/suma-api.dir/src/sql3.c.o: CMakeFiles/suma-api.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/ayush/suma/src/suma_api/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building C object CMakeFiles/suma-api.dir/src/sql3.c.o"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/suma-api.dir/src/sql3.c.o -MF CMakeFiles/suma-api.dir/src/sql3.c.o.d -o CMakeFiles/suma-api.dir/src/sql3.c.o -c /home/ayush/suma/src/suma_api/src/sql3.c
-
-CMakeFiles/suma-api.dir/src/sql3.c.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/suma-api.dir/src/sql3.c.i"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/ayush/suma/src/suma_api/src/sql3.c > CMakeFiles/suma-api.dir/src/sql3.c.i
-
-CMakeFiles/suma-api.dir/src/sql3.c.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/suma-api.dir/src/sql3.c.s"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/ayush/suma/src/suma_api/src/sql3.c -o CMakeFiles/suma-api.dir/src/sql3.c.s
-
-CMakeFiles/suma-api.dir/external/sqlite3/sqlite3.c.o: CMakeFiles/suma-api.dir/flags.make
-CMakeFiles/suma-api.dir/external/sqlite3/sqlite3.c.o: /home/ayush/suma/src/suma_api/external/sqlite3/sqlite3.c
-CMakeFiles/suma-api.dir/external/sqlite3/sqlite3.c.o: CMakeFiles/suma-api.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/ayush/suma/src/suma_api/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building C object CMakeFiles/suma-api.dir/external/sqlite3/sqlite3.c.o"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/suma-api.dir/external/sqlite3/sqlite3.c.o -MF CMakeFiles/suma-api.dir/external/sqlite3/sqlite3.c.o.d -o CMakeFiles/suma-api.dir/external/sqlite3/sqlite3.c.o -c /home/ayush/suma/src/suma_api/external/sqlite3/sqlite3.c
-
-CMakeFiles/suma-api.dir/external/sqlite3/sqlite3.c.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/suma-api.dir/external/sqlite3/sqlite3.c.i"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/ayush/suma/src/suma_api/external/sqlite3/sqlite3.c > CMakeFiles/suma-api.dir/external/sqlite3/sqlite3.c.i
-
-CMakeFiles/suma-api.dir/external/sqlite3/sqlite3.c.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/suma-api.dir/external/sqlite3/sqlite3.c.s"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/ayush/suma/src/suma_api/external/sqlite3/sqlite3.c -o CMakeFiles/suma-api.dir/external/sqlite3/sqlite3.c.s
+CMakeFiles/suma-api.dir/src/ssl_test.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/suma-api.dir/src/ssl_test.c.s"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/ayush/SUMA/src/suma_api/src/ssl_test.c -o CMakeFiles/suma-api.dir/src/ssl_test.c.s
 
 # Object files for target suma-api
 suma__api_OBJECTS = \
-"CMakeFiles/suma-api.dir/src/main.c.o" \
-"CMakeFiles/suma-api.dir/src/sql3.c.o" \
-"CMakeFiles/suma-api.dir/external/sqlite3/sqlite3.c.o"
+"CMakeFiles/suma-api.dir/src/ssl_test.c.o"
 
 # External object files for target suma-api
 suma__api_EXTERNAL_OBJECTS =
 
-suma-api: CMakeFiles/suma-api.dir/src/main.c.o
-suma-api: CMakeFiles/suma-api.dir/src/sql3.c.o
-suma-api: CMakeFiles/suma-api.dir/external/sqlite3/sqlite3.c.o
+suma-api: CMakeFiles/suma-api.dir/src/ssl_test.c.o
 suma-api: CMakeFiles/suma-api.dir/build.make
-suma-api: /home/ayush/c/kubernetes/build/libkubernetes.so
+suma-api: /home/ayush/SUMA/src/suma_api/external/c/kubernetes/build/libkubernetes.so
 suma-api: /usr/lib/x86_64-linux-gnu/libmicrohttpd.so
+suma-api: /usr/lib/x86_64-linux-gnu/libssl.so
+suma-api: /usr/lib/x86_64-linux-gnu/libcrypto.so
 suma-api: CMakeFiles/suma-api.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/ayush/suma/src/suma_api/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Linking C executable suma-api"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/ayush/SUMA/src/suma_api/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking C executable suma-api"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/suma-api.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
@@ -139,6 +109,6 @@ CMakeFiles/suma-api.dir/clean:
 .PHONY : CMakeFiles/suma-api.dir/clean
 
 CMakeFiles/suma-api.dir/depend:
-	cd /home/ayush/suma/src/suma_api/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/ayush/suma/src/suma_api /home/ayush/suma/src/suma_api /home/ayush/suma/src/suma_api/build /home/ayush/suma/src/suma_api/build /home/ayush/suma/src/suma_api/build/CMakeFiles/suma-api.dir/DependInfo.cmake "--color=$(COLOR)"
+	cd /home/ayush/SUMA/src/suma_api/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/ayush/SUMA/src/suma_api /home/ayush/SUMA/src/suma_api /home/ayush/SUMA/src/suma_api/build /home/ayush/SUMA/src/suma_api/build /home/ayush/SUMA/src/suma_api/build/CMakeFiles/suma-api.dir/DependInfo.cmake "--color=$(COLOR)"
 .PHONY : CMakeFiles/suma-api.dir/depend
 

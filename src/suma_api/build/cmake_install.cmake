@@ -1,4 +1,4 @@
-# Install script for directory: /home/ayush/suma/src/suma_api
+# Install script for directory: /home/ayush/SUMA/src/suma_api
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -50,5 +50,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/home/ayush/suma/src/suma_api/build/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/home/ayush/SUMA/src/suma_api/build/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

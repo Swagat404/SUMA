@@ -57,10 +57,10 @@ RM = /usr/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/ayush/suma/src/suma_api
+CMAKE_SOURCE_DIR = /home/ayush/SUMA/src/suma_api
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/ayush/suma/src/suma_api/build
+CMAKE_BINARY_DIR = /home/ayush/SUMA/src/suma_api/build
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -87,9 +87,9 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/ayush/suma/src/suma_api/build/CMakeFiles /home/ayush/suma/src/suma_api/build//CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/ayush/SUMA/src/suma_api/build/CMakeFiles /home/ayush/SUMA/src/suma_api/build//CMakeFiles/progress.marks
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/ayush/suma/src/suma_api/build/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/ayush/SUMA/src/suma_api/build/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -129,77 +129,29 @@ suma-api/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/suma-api.dir/build.make CMakeFiles/suma-api.dir/build
 .PHONY : suma-api/fast
 
-external/sqlite3/sqlite3.o: external/sqlite3/sqlite3.c.o
-.PHONY : external/sqlite3/sqlite3.o
+src/ssl_test.o: src/ssl_test.c.o
+.PHONY : src/ssl_test.o
 
 # target to build an object file
-external/sqlite3/sqlite3.c.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/suma-api.dir/build.make CMakeFiles/suma-api.dir/external/sqlite3/sqlite3.c.o
-.PHONY : external/sqlite3/sqlite3.c.o
+src/ssl_test.c.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/suma-api.dir/build.make CMakeFiles/suma-api.dir/src/ssl_test.c.o
+.PHONY : src/ssl_test.c.o
 
-external/sqlite3/sqlite3.i: external/sqlite3/sqlite3.c.i
-.PHONY : external/sqlite3/sqlite3.i
-
-# target to preprocess a source file
-external/sqlite3/sqlite3.c.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/suma-api.dir/build.make CMakeFiles/suma-api.dir/external/sqlite3/sqlite3.c.i
-.PHONY : external/sqlite3/sqlite3.c.i
-
-external/sqlite3/sqlite3.s: external/sqlite3/sqlite3.c.s
-.PHONY : external/sqlite3/sqlite3.s
-
-# target to generate assembly for a file
-external/sqlite3/sqlite3.c.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/suma-api.dir/build.make CMakeFiles/suma-api.dir/external/sqlite3/sqlite3.c.s
-.PHONY : external/sqlite3/sqlite3.c.s
-
-src/main.o: src/main.c.o
-.PHONY : src/main.o
-
-# target to build an object file
-src/main.c.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/suma-api.dir/build.make CMakeFiles/suma-api.dir/src/main.c.o
-.PHONY : src/main.c.o
-
-src/main.i: src/main.c.i
-.PHONY : src/main.i
+src/ssl_test.i: src/ssl_test.c.i
+.PHONY : src/ssl_test.i
 
 # target to preprocess a source file
-src/main.c.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/suma-api.dir/build.make CMakeFiles/suma-api.dir/src/main.c.i
-.PHONY : src/main.c.i
+src/ssl_test.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/suma-api.dir/build.make CMakeFiles/suma-api.dir/src/ssl_test.c.i
+.PHONY : src/ssl_test.c.i
 
-src/main.s: src/main.c.s
-.PHONY : src/main.s
-
-# target to generate assembly for a file
-src/main.c.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/suma-api.dir/build.make CMakeFiles/suma-api.dir/src/main.c.s
-.PHONY : src/main.c.s
-
-src/sql3.o: src/sql3.c.o
-.PHONY : src/sql3.o
-
-# target to build an object file
-src/sql3.c.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/suma-api.dir/build.make CMakeFiles/suma-api.dir/src/sql3.c.o
-.PHONY : src/sql3.c.o
-
-src/sql3.i: src/sql3.c.i
-.PHONY : src/sql3.i
-
-# target to preprocess a source file
-src/sql3.c.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/suma-api.dir/build.make CMakeFiles/suma-api.dir/src/sql3.c.i
-.PHONY : src/sql3.c.i
-
-src/sql3.s: src/sql3.c.s
-.PHONY : src/sql3.s
+src/ssl_test.s: src/ssl_test.c.s
+.PHONY : src/ssl_test.s
 
 # target to generate assembly for a file
-src/sql3.c.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/suma-api.dir/build.make CMakeFiles/suma-api.dir/src/sql3.c.s
-.PHONY : src/sql3.c.s
+src/ssl_test.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/suma-api.dir/build.make CMakeFiles/suma-api.dir/src/ssl_test.c.s
+.PHONY : src/ssl_test.c.s
 
 # Help Target
 help:
@@ -210,15 +162,9 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... suma-api"
-	@echo "... external/sqlite3/sqlite3.o"
-	@echo "... external/sqlite3/sqlite3.i"
-	@echo "... external/sqlite3/sqlite3.s"
-	@echo "... src/main.o"
-	@echo "... src/main.i"
-	@echo "... src/main.s"
-	@echo "... src/sql3.o"
-	@echo "... src/sql3.i"
-	@echo "... src/sql3.s"
+	@echo "... src/ssl_test.o"
+	@echo "... src/ssl_test.i"
+	@echo "... src/ssl_test.s"
 .PHONY : help
 
 

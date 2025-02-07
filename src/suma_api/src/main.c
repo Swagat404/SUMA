@@ -1,58 +1,80 @@
-#include "sql3.h"
+#include <config/kube_config.h>
+#include <include/apiClient.h>
+#include <include/generic.h>
+#include <malloc.h>
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <assert.h>
+#include <errno.h>
+#include "ssl.h"
+/**
+First step: check if a node exists in the cluster. monitor it's status. 
 
-/* need to test basic data_base functioanlity
-continue working on a suma_router on which we can configure various endpoints with authentication and privellege based access 
-to which routines can subscribe*/
+Creating/deleting/pathcing(NodeSelector) namespaces
+Creating/delete/patching role
+Crating/deleting/patching rolebinding
 
+
+*/
+
+
+int main(int argc, char *argv[])
+{
+
+
+    char *basePath = NULL;
+    sslConfig_t *sslConfig = NULL;
+    list_t *apiKeys = NULL;
+    int rc = load_kube_config(&basePath, &sslConfig, &apiKeys, NULL);   /* NULL means loading configuration from $HOME/.kube/config */
+    if (rc != 0) {
+        printf("Cannot load kubernetes configuration.\n");
+        return -1;
+    }
+    apiClient_t *apiClient = apiClient_create_with_base_path(basePath, sslConfig, apiKeys);
+    if (!apiClient) {
+        printf("Cannot create a kubernetes client.\n");
+        return -1;
+    }
 
 /*
-callback for sql3_select(): prints output to cosole
+we will load a generic template for theses yamls and store them in structs provided by tthe documenation.after that we can directly operate with 
+those structs. I think there are even lib that can convert yamls to structs and structs to yaml.
 */
-int callback(void *NotUsed, int argc, char **argv, char **azColName) {
-    for (int i = 0; i < argc; i++) {
-        printf("%s = %s\n", azColName[i], argv[i] ? argv[i] : "NULL");
-    }
-    printf("\n");
-    return 0;
-}
+ genericClient_t *genericClient = genericClient_create(apiClient, "rbac.authorization.k8s.io", "v1", "namespaces/test/roles");
 
-int main() {
-    
-    /*
-    Test database connection
-    */
-    sqlite3 *db;
-    int rc = sql3_init("user_data.db", SQLITE_OPEN_CREATE, NULL);
-    if (rc != SQLITE_OK) {
-        printf("Failed to initialize database.\n");
-        return 0;
-    }
+    const char *body = "{"
+    "\"apiVersion\": \"rbac.authorization.k8s.io/v1\","
+    "\"kind\": \"Role\","
+    "\"metadata\": {"
+        "\"name\": \"readonly-role\","
+        "\"namespace\": \"test\""
+    "},"
+    "\"rules\": ["
+        "{"
+            "\"apiGroups\": [\"\"],"
+            "\"resources\": [\"pods\", \"services\", \"configmaps\", \"secrets\"],"
+            "\"verbs\": [\"get\", \"list\", \"watch\"]"
+        "},"
+        "{"
+            "\"apiGroups\": [\"apps\"],"
+            "\"resources\": [\"deployments\"],"
+            "\"verbs\": [\"get\", \"list\", \"watch\"]"
+        "}"
+    "]"
+"}";
 
-    rc = sql3_get_connection(&db);
-    if (rc != SQLITE_OK) {
-        printf("Failed to get database handle.\n");
-        return 0;
-    }
+    char *create = Generic_createResource(genericClient, body);
+    printf("%s\n", create);
+    free(create);
 
-    rc = sql3_select(db,"USER_DATA", "*", NULL, 0, 0);
-    if (rc != SQLITE_OK) {
-        printf("Failed to select data.\n");
-        return 0;
-    }
- 
-    rc = sql3_insert(db, "USER_DATA", "ID,NAME,EMAIL,STATUS, NAMESPACE, JOB", "20, 'AYUSH_NEW_new', 'ayufhe',2,3,3");
-     if (rc != SQLITE_OK) {
-        printf("Failed to insert data.\n");
-        return 0;
-    }
-    sql3_release_connection();
-    printf("Database connection Tests passed.\n");
+    genericClient_free(genericClient);
+    genericClient = NULL;
 
-
+    apiClient_free(apiClient);
+    apiClient = NULL;
+    free_client_config(basePath, sslConfig, apiKeys);
+    basePath = NULL;
+    sslConfig = NULL;
+    apiKeys = NULL;
+    apiClient_unsetupGlobalEnv();
 
     return 0;
 }
